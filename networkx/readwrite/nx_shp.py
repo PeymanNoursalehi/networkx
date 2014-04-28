@@ -2,7 +2,11 @@
 *********
 Shapefile
 *********
+####
 
+Edited read write, added file name option
+
+#####
 Generates a networkx.DiGraph from point and line shapefiles.
 
 "The Esri Shapefile or simply a shapefile is a popular geospatial vector
@@ -87,7 +91,7 @@ def read_shp(path):
     return net
 
 
-def write_shp(G, outdir):
+def write_shp(G, outdir,nodes_name,edges_name):
     """Writes a networkx.DiGraph to two shapefiles, edges and nodes.
     Nodes and edges are expected to have a Well Known Binary (Wkb) or
     Well Known Text (Wkt) key in order to generate geometries. Also
@@ -163,19 +167,19 @@ def write_shp(G, outdir):
     shpdir = drv.CreateDataSource(outdir)
     # delete pre-existing output first otherwise ogr chokes
     try:
-        shpdir.DeleteLayer("nodes")
+        shpdir.DeleteLayer(nodes_name)
     except:
         pass
-    nodes = shpdir.CreateLayer("nodes", None, ogr.wkbPoint)
+    nodes = shpdir.CreateLayer(nodes_name, None, ogr.wkbPoint)
     for n in G:
         data = G.node[n] or {}
         g = netgeometry(n, data)
         create_feature(g, nodes)
     try:
-        shpdir.DeleteLayer("edges")
+        shpdir.DeleteLayer(edges_name)
     except:
         pass
-    edges = shpdir.CreateLayer("edges", None, ogr.wkbLineString)
+    edges = shpdir.CreateLayer(edges_name, None, ogr.wkbLineString)
 
     # New edge attribute write support merged into edge loop
     fields = {}      # storage for field names and their data types
